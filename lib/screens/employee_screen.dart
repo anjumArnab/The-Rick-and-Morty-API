@@ -8,9 +8,7 @@ class EmployeeScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.lightBlue.shade300,
       appBar: AppBar(
-        backgroundColor: Colors.lightBlue.shade100,
         centerTitle: true,
         title: const Text("Employee Data"),
         actions: [
@@ -40,15 +38,8 @@ class EmployeeScreen extends StatelessWidget {
                       horizontal: 12.0, vertical: 6.0),
                   child: Container(
                     decoration: BoxDecoration(
-                      color: Colors.lime.shade100,
                       borderRadius: BorderRadius.circular(10.0),
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.black.withOpacity(0.2),
-                          blurRadius: 6.0,
-                          offset: const Offset(0, 3),
-                        ),
-                      ],
+                     border: Border.all(color: Colors.black),
                     ),
                     child: SizedBox(
                       height: 90, // Small container height
