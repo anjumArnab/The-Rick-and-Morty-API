@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:rest_api/screens/employee_screen.dart';
 
 void main() {
@@ -14,8 +15,7 @@ class RESTAPI extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       title: "Rest API",
       theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
-        useMaterial3: true,
+        textTheme: GoogleFonts.poppinsTextTheme()
       ),
       home: const EmployeeScreen(),
     );
