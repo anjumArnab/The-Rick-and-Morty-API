@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-
 import '../models/employee.dart';
 import '../services/employee_services.dart';
 
@@ -39,14 +38,20 @@ class EmployeeScreen extends StatelessWidget {
                 return Padding(
                   padding: const EdgeInsets.symmetric(
                       horizontal: 12.0, vertical: 6.0),
-                  child: Card(
-                    color: Colors.lime.shade100, // Customize the card color here
-                    elevation: 6.0,
-                    shape: RoundedRectangleBorder(
+                  child: Container(
+                    decoration: BoxDecoration(
+                      color: Colors.lime.shade100,
                       borderRadius: BorderRadius.circular(10.0),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withOpacity(0.2),
+                          blurRadius: 6.0,
+                          offset: const Offset(0, 3),
+                        ),
+                      ],
                     ),
                     child: SizedBox(
-                      height: 90, // Small card height
+                      height: 90, // Small container height
                       child: Padding(
                         padding: const EdgeInsets.all(10.0),
                         child: Row(
