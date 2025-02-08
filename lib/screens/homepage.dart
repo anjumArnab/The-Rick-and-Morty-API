@@ -81,7 +81,7 @@ class _HomePageState extends State<HomePage> {
             crossAxisCount: 2,
             crossAxisSpacing: 8.0,
             mainAxisSpacing: 8.0,
-            childAspectRatio: 0.7, // Adjusted to prevent overflow
+            childAspectRatio: 0.7,
           ),
           itemCount: characterData.length,
           itemBuilder: (context, index) {
