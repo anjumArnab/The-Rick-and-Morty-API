@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:rest_api/screens/employee_screen.dart';
-
+import 'package:rest_api/screens/homepage.dart';
 
 void main() {
   runApp(const RESTAPI());
@@ -14,11 +13,11 @@ class RESTAPI extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      title: "Rest API",
+      title: "The Rick And Morty",
       theme: ThemeData(
         textTheme: GoogleFonts.poppinsTextTheme()
       ),
-      home: const EmployeeScreen(),
+      home: const HomePage(),
     );
   }
 }
