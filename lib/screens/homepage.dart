@@ -9,6 +9,8 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
+  bool isSearching = false; // Flag to check if search is active
+  TextEditingController searchController = TextEditingController(); // Controller for search bar
   final List<Map<String, String>> characterData = [
     {
       "imageUrl": "https://rickandmortyapi.com/api/character/avatar/1.jpeg",
@@ -72,7 +74,38 @@ class _HomePageState extends State<HomePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('The Rick And Morty'),
+        title: isSearching
+            ? TextField(
+                controller: searchController,
+                autofocus: true,
+                decoration: const InputDecoration(
+                  hintText: 'Search by Character, Episode or Location...',
+                  hintStyle: TextStyle(color: Colors.black),
+                ),
+                onChanged: (_){
+                  // Add search functionality here
+                },
+              )
+            : const Text('The Rick And Morty'),
+        actions:[
+           isSearching
+              ? IconButton(
+                  icon: const Icon(Icons.cancel),
+                  onPressed: () {},
+                )
+              : IconButton(
+                  icon: const Icon(Icons.search),
+                  onPressed: () {
+                    setState(() {
+                      isSearching = true;
+                    });
+                  },
+                ),
+          IconButton(
+            onPressed:(){},
+            icon: const Icon(Icons.refresh),
+          )
+        ]
       ),
       body: Padding(
         padding: const EdgeInsets.all(8.0),
