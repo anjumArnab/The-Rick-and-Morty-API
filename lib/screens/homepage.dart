@@ -1,5 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:rest_api/screens/charecter_info.dart';
+import 'package:rest_api/services/api_services.dart';
+import 'package:rest_api/models/character_response.dart';
+import 'package:rest_api/models/location.dart';
+import 'package:rest_api/models/episode.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -11,64 +15,26 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   bool isSearching = false; // Flag to check if search is active
   TextEditingController searchController = TextEditingController(); // Controller for search bar
-  final List<Map<String, String>> characterData = [
-    {
-      "imageUrl": "https://rickandmortyapi.com/api/character/avatar/1.jpeg",
-      "name": "Rick Sanchez",
-      "status": "Alive",
-      "species": "Human",
-      "lastKnownLocation": "Earth (Replacement Dimension)",
-      "firstSeen": "Pilot",
-    },
-    {
-      "imageUrl": "https://rickandmortyapi.com/api/character/avatar/2.jpeg",
-      "name": "Morty Smith",
-      "status": "Alive",
-      "species": "Human",
-      "lastKnownLocation": "Earth (Replacement Dimension)",
-      "firstSeen": "Pilot",
-    },
-    {
-      "imageUrl": "https://rickandmortyapi.com/api/character/avatar/3.jpeg",
-      "name": "Summer Smith",
-      "status": "Alive",
-      "species": "Human",
-      "lastKnownLocation": "Earth (Replacement Dimension)",
-      "firstSeen": "Pilot",
-    },
-    {
-      "imageUrl": "https://rickandmortyapi.com/api/character/avatar/4.jpeg",
-      "name": "Beth Smith",
-      "status": "Alive",
-      "species": "Human",
-      "lastKnownLocation": "Earth (Replacement Dimension)",
-      "firstSeen": "Pilot",
-    },
-    {
-      "imageUrl": "https://rickandmortyapi.com/api/character/avatar/5.jpeg",
-      "name": "Jerry Smith",
-      "status": "Alive",
-      "species": "Human",
-      "lastKnownLocation": "Earth (Replacement Dimension)",
-      "firstSeen": "Pilot",
-    },
-    {
-      "imageUrl": "https://rickandmortyapi.com/api/character/avatar/6.jpeg",
-      "name": "Birdperson",
-      "status": "Alive",
-      "species": "Bird-Person",
-      "lastKnownLocation": "Planet Squanch",
-      "firstSeen": "Ricksy Business",
-    },
-    {
-      "imageUrl": "https://rickandmortyapi.com/api/character/avatar/7.jpeg",
-      "name": "Mr. Meeseeks",
-      "status": "Unknown",
-      "species": "Meeseeks",
-      "lastKnownLocation": "Unknown",
-      "firstSeen": "Meeseeks and Destroy",
-    }
-  ];
+
+  late ApiService apiService;
+  late Future<CharacterResponse> charactersFuture;
+
+  @override
+  void initState() {
+    super.initState();
+    apiService = ApiService();
+    charactersFuture = apiService.fetchCharacters();
+  }
+
+  // Function to fetch location details
+  Future<LocationModel> fetchLocation(String locationUrl) async {
+    return await apiService.fetchLocation(locationUrl);
+  }
+
+  // Function to fetch episode details
+  Future<EpisodeModel> fetchEpisode(String episodeUrl) async {
+    return await apiService.fetchEpisode(episodeUrl);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -88,10 +54,14 @@ class _HomePageState extends State<HomePage> {
               )
             : const Text('The Rick And Morty'),
         actions:[
-           isSearching
+          isSearching
               ? IconButton(
                   icon: const Icon(Icons.cancel),
-                  onPressed: () {},
+                  onPressed: () {
+                    setState(() {
+                      isSearching = false;
+                    });
+                  },
                 )
               : IconButton(
                   icon: const Icon(Icons.search),
@@ -102,33 +72,51 @@ class _HomePageState extends State<HomePage> {
                   },
                 ),
           IconButton(
-            onPressed:(){},
+            onPressed: () {
+              setState(() {
+                charactersFuture = apiService.fetchCharacters(); // Refresh data
+              });
+            },
             icon: const Icon(Icons.refresh),
-          )
+          ),
         ]
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(8.0),
-        child: GridView.builder(
-          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-            crossAxisCount: 2,
-            crossAxisSpacing: 8.0,
-            mainAxisSpacing: 8.0,
-            childAspectRatio: 0.7,
-          ),
-          itemCount: characterData.length,
-          itemBuilder: (context, index) {
-            final character = characterData[index];
-            return CharacterCard(
-              imageUrl: character["imageUrl"]?.isNotEmpty == true ? character["imageUrl"]! : "",
-              name: character["name"]!,
-              status: character["status"]!,
-              species: character["species"]!,
-              lastKnownLocation: character["lastKnownLocation"]!,
-              firstSeen: character["firstSeen"]!,
+      body: FutureBuilder<CharacterResponse>(
+        future: charactersFuture,
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return const Center(child: CircularProgressIndicator());
+          } else if (snapshot.hasError) {
+            return Center(child: Text('Error: ${snapshot.error}'));
+          } else if (!snapshot.hasData || snapshot.data!.results.isEmpty) {
+            return const Center(child: Text('No characters found'));
+          } else {
+            final characters = snapshot.data!.results;
+            return Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: GridView.builder(
+                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                  crossAxisCount: 2,
+                  crossAxisSpacing: 8.0,
+                  mainAxisSpacing: 8.0,
+                  childAspectRatio: 0.7,
+                ),
+                itemCount: characters.length,
+                itemBuilder: (context, index) {
+                  final character = characters[index];
+                  return CharacterCard(
+                    imageUrl: character.image,
+                    name: character.name,
+                    status: character.status,
+                    species: character.species,
+                    lastKnownLocation: character.location.name,
+                    firstSeen: character.episode.isNotEmpty ? character.episode[0] : '',
+                  );
+                },
+              ),
             );
-          },
-        ),
+          }
+        },
       ),
     );
   }
