@@ -36,6 +36,12 @@ class _HomePageState extends State<HomePage> {
     });
   }
 
+  @override
+  void dispose() {
+    _scrollController.dispose(); // Dispose scroll controller
+    super.dispose();
+  }
+
   Future<void> fetchInitialCharacters() async {
     setState(() => isLoading = true);
     try {
@@ -126,11 +132,5 @@ class _HomePageState extends State<HomePage> {
         ),
       ),
     );
-  }
-
-  @override
-  void dispose() {
-    _scrollController.dispose(); // Dispose scroll controller
-    super.dispose();
   }
 }
