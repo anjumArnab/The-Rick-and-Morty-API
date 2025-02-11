@@ -13,27 +13,54 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  bool isSearching = false; // Flag to check if search is active
-  TextEditingController searchController = TextEditingController(); // Controller for search bar
+  bool isSearching = false;
+  TextEditingController searchController = TextEditingController();
 
   late ApiService apiService;
-  late Future<CharacterResponse> charactersFuture;
+  List<Character> characters = []; // Added list to store characters
+  bool isLoading = false; // Track loading state
+  String? nextPageUrl; // Store next page URL
+  ScrollController _scrollController = ScrollController(); // Added scroll controller
 
   @override
   void initState() {
     super.initState();
     apiService = ApiService();
-    charactersFuture = apiService.fetchCharacters();
+    fetchInitialCharacters();
+
+    // Listener for scroll events
+    _scrollController.addListener(() {
+      if (_scrollController.position.pixels == _scrollController.position.maxScrollExtent) {
+        fetchMoreCharacters();
+      }
+    });
   }
 
-  // Function to fetch location details
-  Future<LocationModel> fetchLocation(String locationUrl) async {
-    return await apiService.fetchLocation(locationUrl);
+  Future<void> fetchInitialCharacters() async {
+    setState(() => isLoading = true);
+    try {
+      CharacterResponse response = await apiService.fetchCharacters();
+      setState(() {
+        characters = response.results;
+        nextPageUrl = response.next;
+      });
+    } finally {
+      setState(() => isLoading = false);
+    }
   }
 
-  // Function to fetch episode details
-  Future<EpisodeModel> fetchEpisode(String episodeUrl) async {
-    return await apiService.fetchEpisode(episodeUrl);
+  Future<void> fetchMoreCharacters() async {
+    if (isLoading || nextPageUrl == null) return;
+    setState(() => isLoading = true);
+    try {
+      CharacterResponse response = await apiService.fetchCharacters(nextPageUrl: nextPageUrl);
+      setState(() {
+        characters.addAll(response.results);
+        nextPageUrl = response.next;
+      });
+    } finally {
+      setState(() => isLoading = false);
+    }
   }
 
   @override
@@ -48,76 +75,62 @@ class _HomePageState extends State<HomePage> {
                   hintText: 'Search by Character, Episode or Location...',
                   hintStyle: TextStyle(color: Colors.black),
                 ),
-                onChanged: (_){
-                  // Add search functionality here
-                },
+                onChanged: (_) {},
               )
             : const Text('The Rick And Morty'),
-        actions:[
+        actions: [
           isSearching
               ? IconButton(
                   icon: const Icon(Icons.cancel),
                   onPressed: () {
-                    setState(() {
-                      isSearching = false;
-                    });
+                    setState(() => isSearching = false);
                   },
                 )
               : IconButton(
                   icon: const Icon(Icons.search),
                   onPressed: () {
-                    setState(() {
-                      isSearching = true;
-                    });
+                    setState(() => isSearching = true);
                   },
                 ),
           IconButton(
-            onPressed: () {
-              setState(() {
-                charactersFuture = apiService.fetchCharacters(); // Refresh data
-              });
-            },
+            onPressed: fetchInitialCharacters,
             icon: const Icon(Icons.refresh),
           ),
-        ]
+        ],
       ),
-      body: FutureBuilder<CharacterResponse>(
-        future: charactersFuture,
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return const Center(child: CircularProgressIndicator());
-          } else if (snapshot.hasError) {
-            return Center(child: Text('Error: ${snapshot.error}'));
-          } else if (!snapshot.hasData || snapshot.data!.results.isEmpty) {
-            return const Center(child: Text('No characters found'));
-          } else {
-            final characters = snapshot.data!.results;
-            return Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: GridView.builder(
-                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                  crossAxisCount: 2,
-                  crossAxisSpacing: 8.0,
-                  mainAxisSpacing: 8.0,
-                  childAspectRatio: 0.7,
-                ),
-                itemCount: characters.length,
-                itemBuilder: (context, index) {
-                  final character = characters[index];
-                  return CharacterCard(
-                    imageUrl: character.image,
-                    name: character.name,
-                    status: character.status,
-                    species: character.species,
-                    lastKnownLocation: character.location.name,
-                    firstSeen: character.episode.isNotEmpty ? character.episode[0] : '',
-                  );
-                },
-              ),
+      body: Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: GridView.builder(
+          controller: _scrollController, // Added scroll controller
+          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+            crossAxisCount: 2,
+            crossAxisSpacing: 8.0,
+            mainAxisSpacing: 8.0,
+            childAspectRatio: 0.7,
+          ),
+          itemCount: characters.length + (isLoading ? 1 : 0), // Added loading indicator item
+          itemBuilder: (context, index) {
+            if (index == characters.length) {
+              return const Center(child: CircularProgressIndicator()); // Show loader at end
+            }
+            final character = characters[index];
+            return CharacterCard(
+              imageUrl: character.image,
+              name: character.name,
+              status: character.status,
+              species: character.species,
+              lastKnownLocation: character.location.name,
+              firstSeen: character.episode.isNotEmpty ? character.episode[0] : '',
             );
-          }
-        },
+          },
+        ),
       ),
     );
+  }
+
+  @override
+  void dispose() {
+    _scrollController.dispose(); // Dispose scroll controller
+    super.dispose();
   }
 }
