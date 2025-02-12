@@ -20,7 +20,7 @@ class _HomePageState extends State<HomePage> {
   List<Character> characters = []; // Added list to store characters
   bool isLoading = false; // Track loading state
   String? nextPageUrl; // Store next page URL
-  ScrollController _scrollController = ScrollController(); // Added scroll controller
+  final ScrollController _scrollController = ScrollController(); // Added scroll controller
 
   @override
   void initState() {
