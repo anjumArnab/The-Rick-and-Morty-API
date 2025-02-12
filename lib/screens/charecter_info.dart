@@ -53,20 +53,20 @@ class CharacterCard extends StatelessWidget {
           const SizedBox(height: 1),
           Text(
             name,
-            style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+            style: const TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
           ),
           const SizedBox(height: 5),
           Text(
             '$status - $species',
-            style: TextStyle(fontSize: 16, color: Colors.grey[700]),
+            style: TextStyle(fontSize: 13, color: Colors.grey[700]),
           ),
           const SizedBox(height: 10),
           RichText(
             text: TextSpan(
-              style: const TextStyle(fontSize: 16, color: Colors.black),
+              style: const TextStyle(fontSize: 13, color: Colors.black),
               children: [
                 const TextSpan(
-                  text: 'Last known location:\n',
+                  text: 'Last known location\n',
                   style: TextStyle(fontWeight: FontWeight.bold),
                 ),
                 TextSpan(text: lastKnownLocation),
@@ -76,10 +76,10 @@ class CharacterCard extends StatelessWidget {
           const SizedBox(height: 10),
           RichText(
             text: TextSpan(
-              style: const TextStyle(fontSize: 16, color: Colors.black),
+              style: const TextStyle(fontSize: 13, color: Colors.black),
               children: [
                 const TextSpan(
-                  text: 'First seen in:\n',
+                  text: 'First seen in\n',
                   style: TextStyle(fontWeight: FontWeight.bold),
                 ),
                 TextSpan(text: firstSeen),
