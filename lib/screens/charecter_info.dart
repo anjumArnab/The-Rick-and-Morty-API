@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:rest_api/models/character_response.dart';
 
 class CharacterCard extends StatelessWidget {
   final String imageUrl;
@@ -18,6 +19,19 @@ class CharacterCard extends StatelessWidget {
     required this.firstSeen,
   });
 
+  Color _getBorderColor(dynamic character) {
+    switch (character.status.toLowerCase()) {
+      case 'alive':
+        return Colors.green;
+      case 'dead':
+        return Colors.red;
+      case 'unknown':
+        return Colors.grey;
+      default:
+        return Colors.black;
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -25,7 +39,7 @@ class CharacterCard extends StatelessWidget {
       padding: const EdgeInsets.all(5),
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: Colors.black, width: 2),
+        border: Border.all(color: _getBorderColor(this), width: 2),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -34,9 +48,9 @@ class CharacterCard extends StatelessWidget {
             width: double.infinity,
             padding: const EdgeInsets.symmetric(vertical: 16),
             alignment: Alignment.center,
-            decoration: const BoxDecoration(
-              borderRadius: BorderRadius.vertical(top: Radius.circular(10)),
-              border: Border(bottom: BorderSide(color: Colors.black, width: 2)),
+            decoration: BoxDecoration(
+              borderRadius: const BorderRadius.vertical(top: Radius.circular(10)),
+              border: Border(bottom: BorderSide(color: _getBorderColor(this), width: 2)),
             ),
             child: SizedBox(
               width: 200,
