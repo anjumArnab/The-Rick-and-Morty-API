@@ -50,9 +50,9 @@ Future<EpisodeModel> fetchEpisode(String locationUrl) async {
     }
   }
 
+  // Fetch residents details by URL
   Future<List<ResidentModel>> fetchResidents(List<String> residentUrls) async {
   List<ResidentModel> residents = [];
-
   for (String url in residentUrls) {
     try {
       final response = await http.get(Uri.parse(url));
