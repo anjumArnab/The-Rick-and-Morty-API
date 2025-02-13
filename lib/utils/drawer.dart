@@ -28,15 +28,14 @@ class CustomDrawer extends StatelessWidget {
                   profilePictureUrl),
             ),
             decoration: const BoxDecoration(
-              color: Colors.black26// Set background color
+              color: Colors.black26
             ),
           ),
-          const Divider(),
           // Exit Button
           ListTile(
             leading: const Icon(Icons.exit_to_app, color: Colors.black),
             title: const Text('Exit'),
-            onTap: onExit, // Add exit functionality here
+            onTap: onExit,
           ),
         ],
       ),
