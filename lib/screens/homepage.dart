@@ -2,8 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:rest_api/screens/charecter_info.dart';
 import 'package:rest_api/services/api_services.dart';
 import 'package:rest_api/models/character_response.dart';
-import 'package:rest_api/models/location.dart';
-import 'package:rest_api/models/episode.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -126,7 +124,7 @@ class _HomePageState extends State<HomePage> {
               status: character.status,
               species: character.species,
               lastKnownLocation: character.location.name,
-              firstSeen: character.episode.isNotEmpty ? character.episode[0] : '',
+              firstSeen: character.origin.name,
             );
           },
         ),

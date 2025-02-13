@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:rest_api/models/character_response.dart';
+import 'package:rest_api/models/location.dart';
+import 'package:rest_api/services/api_services.dart';
 
 class CharacterCard extends StatelessWidget {
   final String imageUrl;
@@ -9,7 +10,7 @@ class CharacterCard extends StatelessWidget {
   final String lastKnownLocation;
   final String firstSeen;
 
-  const CharacterCard({
+   CharacterCard({
     super.key,
     required this.imageUrl,
     required this.name,
@@ -18,6 +19,7 @@ class CharacterCard extends StatelessWidget {
     required this.lastKnownLocation,
     required this.firstSeen,
   });
+  List<LocationModel> locations = [];
 
   Color _getBorderColor(dynamic character) {
     switch (character.status.toLowerCase()) {
@@ -30,6 +32,42 @@ class CharacterCard extends StatelessWidget {
       default:
         return Colors.black;
     }
+  }
+
+  late ApiService apiService;
+  Future<void> fetchLocationDetails(String locationUrl) async {
+    apiService = ApiService();
+    try {
+      // CharacterResponse response = await apiService.fetchCharacters(nextPageUrl: nextPageUrl);
+      LocationModel response = await apiService.fetchLocation(locationUrl);
+      locations.add(response);
+    } catch (e) {
+      print('Error occurred: $e');
+    }
+  }
+  void _showModalBottomSheet(BuildContext context) {
+    // other characters shown in this location
+    showModalBottomSheet(
+      context: context,
+      builder: (context) {
+        return Center(
+          child: Column(
+            children: [
+              ListView.builder(
+                itemCount: locations.length,
+            itemBuilder: (context, index) {
+              return Card(
+                child: ListTile(
+                  title: Text(locations[index].name),
+                ),
+              );
+            },
+              ),
+            ],
+          ),
+        );
+      },
+    );
   }
 
   @override
@@ -49,8 +87,10 @@ class CharacterCard extends StatelessWidget {
             padding: const EdgeInsets.symmetric(vertical: 16),
             alignment: Alignment.center,
             decoration: BoxDecoration(
-              borderRadius: const BorderRadius.vertical(top: Radius.circular(10)),
-              border: Border(bottom: BorderSide(color: _getBorderColor(this), width: 2)),
+              borderRadius:
+                  const BorderRadius.vertical(top: Radius.circular(10)),
+              border: Border(
+                  bottom: BorderSide(color: _getBorderColor(this), width: 2)),
             ),
             child: SizedBox(
               width: 200,
@@ -83,7 +123,16 @@ class CharacterCard extends StatelessWidget {
                   text: 'Last known location\n',
                   style: TextStyle(fontWeight: FontWeight.bold),
                 ),
-                TextSpan(text: lastKnownLocation),
+                WidgetSpan(
+                  child: GestureDetector(
+                    onTap: () {
+                      _showModalBottomSheet(context);
+                    },
+                    child: Text(
+                      lastKnownLocation,
+                    ),
+                  ),
+                ),
               ],
             ),
           ),
