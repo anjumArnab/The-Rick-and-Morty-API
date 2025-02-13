@@ -3,6 +3,7 @@ import 'package:http/http.dart' as http;
 import 'package:rest_api/models/character_response.dart';
 import 'package:rest_api/models/location.dart';
 import 'package:rest_api/models/episode.dart';
+import 'package:rest_api/models/residents.dart';
 
 class ApiService {
   static const String baseUrl = 'https://rickandmortyapi.com/api/character';
@@ -48,5 +49,23 @@ Future<EpisodeModel> fetchEpisode(String locationUrl) async {
       throw Exception('Error occurred: $e');
     }
   }
+
+  Future<List<ResidentModel>> fetchResidents(List<String> residentUrls) async {
+  List<ResidentModel> residents = [];
+
+  for (String url in residentUrls) {
+    try {
+      final response = await http.get(Uri.parse(url));
+      if (response.statusCode == 200) {
+        residents.add(ResidentModel.fromJson(json.decode(response.body)));
+      }
+    } catch (e) {
+      print('Error fetching resident: $e');
+    }
+  }
+
+  return residents;
+}
+
 
 }

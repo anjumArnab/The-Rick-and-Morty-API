@@ -125,6 +125,7 @@ class _HomePageState extends State<HomePage> {
               species: character.species,
               lastKnownLocation: character.location.name,
               firstSeen: character.origin.name,
+              locationUrl: character.origin.url,
             );
           },
         ),

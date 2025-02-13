@@ -8,6 +8,7 @@ class CharacterCard extends StatelessWidget {
   final String species;
   final String lastKnownLocation;
   final String firstSeen;
+  final String locationUrl;
 
    CharacterCard({
     super.key,
@@ -17,6 +18,7 @@ class CharacterCard extends StatelessWidget {
     required this.species,
     required this.lastKnownLocation,
     required this.firstSeen,
+    required this.locationUrl,
   });
   
 
@@ -102,7 +104,7 @@ class CharacterCard extends StatelessWidget {
                 WidgetSpan(
                   child: GestureDetector(
                     onTap: () {
-                      _showModalBottomSheet(context, "https://rickandmortyapi.com/api/location/1");
+                      _showModalBottomSheet(context, locationUrl);
                     },
                     child: Text(
                       lastKnownLocation,
