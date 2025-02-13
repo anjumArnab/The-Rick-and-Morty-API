@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:rest_api/screens/charecter_info.dart';
 import 'package:rest_api/services/api_services.dart';
 import 'package:rest_api/models/character_response.dart';
+import 'package:rest_api/utils/drawer.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -70,6 +71,12 @@ class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      drawer: CustomDrawer(
+        accountName: 'Morty Smith',
+        profilePictureUrl: 'https://rickandmortyapi.com/api/character/avatar/2.jpeg',
+        accountEmail: 'mortysmith@gmail.com',
+        onExit: () {},
+      ),
       appBar: AppBar(
         title: isSearching
             ? TextField(
