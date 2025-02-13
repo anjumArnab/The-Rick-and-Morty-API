@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:rest_api/models/location.dart';
-import 'package:rest_api/services/api_services.dart';
+import 'package:rest_api/utils/bottom_sheet.dart';
 
 class CharacterCard extends StatelessWidget {
   final String imageUrl;
@@ -19,7 +18,7 @@ class CharacterCard extends StatelessWidget {
     required this.lastKnownLocation,
     required this.firstSeen,
   });
-  List<LocationModel> locations = [];
+  
 
   Color _getBorderColor(dynamic character) {
     switch (character.status.toLowerCase()) {
@@ -34,41 +33,18 @@ class CharacterCard extends StatelessWidget {
     }
   }
 
-  late ApiService apiService;
-  Future<void> fetchLocationDetails(String locationUrl) async {
-    apiService = ApiService();
-    try {
-      // CharacterResponse response = await apiService.fetchCharacters(nextPageUrl: nextPageUrl);
-      LocationModel response = await apiService.fetchLocation(locationUrl);
-      locations.add(response);
-    } catch (e) {
-      print('Error occurred: $e');
-    }
-  }
-  void _showModalBottomSheet(BuildContext context) {
-    // other characters shown in this location
-    showModalBottomSheet(
-      context: context,
-      builder: (context) {
-        return Center(
-          child: Column(
-            children: [
-              ListView.builder(
-                itemCount: locations.length,
-            itemBuilder: (context, index) {
-              return Card(
-                child: ListTile(
-                  title: Text(locations[index].name),
-                ),
-              );
-            },
-              ),
-            ],
-          ),
-        );
-      },
-    );
-  }
+  
+  void _showModalBottomSheet(BuildContext context, String locationUrl) {
+  showModalBottomSheet(
+    context: context,
+    isScrollControlled: true,
+    builder: (context) {
+      return BottomSheetWidget(locationUrl: locationUrl);
+    },
+  );
+}
+
+  
 
   @override
   Widget build(BuildContext context) {
@@ -126,7 +102,7 @@ class CharacterCard extends StatelessWidget {
                 WidgetSpan(
                   child: GestureDetector(
                     onTap: () {
-                      _showModalBottomSheet(context);
+                      _showModalBottomSheet(context, "https://rickandmortyapi.com/api/location/1");
                     },
                     child: Text(
                       lastKnownLocation,
