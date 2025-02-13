@@ -63,9 +63,6 @@ Future<EpisodeModel> fetchEpisode(String locationUrl) async {
       print('Error fetching resident: $e');
     }
   }
-
   return residents;
 }
-
-
 }
