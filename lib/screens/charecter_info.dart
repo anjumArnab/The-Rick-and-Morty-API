@@ -10,7 +10,7 @@ class CharacterCard extends StatelessWidget {
   final String firstSeen;
   final String locationUrl;
 
-   CharacterCard({
+  const CharacterCard({
     super.key,
     required this.imageUrl,
     required this.name,
@@ -20,10 +20,9 @@ class CharacterCard extends StatelessWidget {
     required this.firstSeen,
     required this.locationUrl,
   });
-  
 
-  Color _getBorderColor(dynamic character) {
-    switch (character.status.toLowerCase()) {
+  Color _getBorderColor() {
+    switch (status.toLowerCase()) {
       case 'alive':
         return Colors.green;
       case 'dead':
@@ -35,99 +34,101 @@ class CharacterCard extends StatelessWidget {
     }
   }
 
-  
-  void _showModalBottomSheet(BuildContext context, String locationUrl) {
-  showModalBottomSheet(
-    context: context,
-    isScrollControlled: true,
-    builder: (context) {
-      return BottomSheetWidget(locationUrl: locationUrl);
-    },
-  );
-}
-
-  
+  void _showModalBottomSheet(BuildContext context) {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      builder: (context) {
+        return BottomSheetWidget(locationUrl: locationUrl);
+      },
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
     return Container(
       margin: const EdgeInsets.all(5),
-      padding: const EdgeInsets.all(5),
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: _getBorderColor(this), width: 2),
+        border: Border.all(color: _getBorderColor(), width: 2),
       ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Container(
-            width: double.infinity,
-            padding: const EdgeInsets.symmetric(vertical: 16),
-            alignment: Alignment.center,
-            decoration: BoxDecoration(
-              borderRadius:
-                  const BorderRadius.vertical(top: Radius.circular(10)),
-              border: Border(
-                  bottom: BorderSide(color: _getBorderColor(this), width: 2)),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(12),
+        child: Stack(
+          children: [
+            Positioned.fill(
+              child: Image.network(
+                imageUrl,
+                fit: BoxFit.cover,
+              ),
             ),
-            child: SizedBox(
-              width: 200,
-              height: 110,
-              child: ClipRRect(
-                borderRadius: BorderRadius.circular(8),
-                child: Image.network(
-                  imageUrl,
-                  fit: BoxFit.cover,
+            Positioned(
+              bottom: 10,
+              left: 10,
+              right: 10,
+              child: Container(
+                padding: const EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                  color: Colors.black.withOpacity(0.6),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      name,
+                      style: const TextStyle(
+                          fontSize: 15,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.white),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                    Text(
+                      '$status - $species',
+                      style: const TextStyle(
+                          fontSize: 13, color: Colors.white70),
+                    ),
+                    RichText(
+                      text: TextSpan(
+                        style: const TextStyle(fontSize: 13, color: Colors.white),
+                        children: [
+                          const TextSpan(
+                            text: 'Last known location\n',
+                            style: TextStyle(fontWeight: FontWeight.bold),
+                          ),
+                          WidgetSpan(
+                            child: GestureDetector(
+                              onTap: () {
+                                _showModalBottomSheet(context);
+                              },
+                              child: Text(
+                                lastKnownLocation,
+                                style: const TextStyle(color: Colors.blue),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    RichText(
+                      text: TextSpan(
+                        style: const TextStyle(fontSize: 13, color: Colors.white),
+                        children: [
+                          const TextSpan(
+                            text: 'First seen in\n',
+                            style: TextStyle(fontWeight: FontWeight.bold),
+                          ),
+                          TextSpan(text: firstSeen),
+                        ],
+                      ),
+                    ),
+                  ],
                 ),
               ),
             ),
-          ),
-          const SizedBox(height: 1),
-          Text(
-            name,
-            style: const TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
-          ),
-          const SizedBox(height: 5),
-          Text(
-            '$status - $species',
-            style: TextStyle(fontSize: 13, color: Colors.grey[700]),
-          ),
-          const SizedBox(height: 10),
-          RichText(
-            text: TextSpan(
-              style: const TextStyle(fontSize: 13, color: Colors.black),
-              children: [
-                const TextSpan(
-                  text: 'Last known location\n',
-                  style: TextStyle(fontWeight: FontWeight.bold),
-                ),
-                WidgetSpan(
-                  child: GestureDetector(
-                    onTap: () {
-                      _showModalBottomSheet(context, locationUrl);
-                    },
-                    child: Text(
-                      lastKnownLocation,
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
-          const SizedBox(height: 10),
-          RichText(
-            text: TextSpan(
-              style: const TextStyle(fontSize: 13, color: Colors.black),
-              children: [
-                const TextSpan(
-                  text: 'First seen in\n',
-                  style: TextStyle(fontWeight: FontWeight.bold),
-                ),
-                TextSpan(text: firstSeen),
-              ],
-            ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
