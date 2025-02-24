@@ -16,10 +16,10 @@ class _HomePageState extends State<HomePage> {
   TextEditingController searchController = TextEditingController();
 
   late ApiService apiService;
-  List<Character> characters = []; // Added list to store characters
-  bool isLoading = false; // Track loading state
-  String? nextPageUrl; // Store next page URL
-  final ScrollController _scrollController = ScrollController(); // Added scroll controller
+  List<Character> characters = [];
+  bool isLoading = false;
+  String? nextPageUrl;
+  final ScrollController _scrollController = ScrollController();
 
   @override
   void initState() {
@@ -27,7 +27,6 @@ class _HomePageState extends State<HomePage> {
     apiService = ApiService();
     fetchInitialCharacters();
 
-    // Listener for scroll events
     _scrollController.addListener(() {
       if (_scrollController.position.pixels == _scrollController.position.maxScrollExtent) {
         fetchMoreCharacters();
@@ -37,7 +36,7 @@ class _HomePageState extends State<HomePage> {
 
   @override
   void dispose() {
-    _scrollController.dispose(); // Dispose scroll controller
+    _scrollController.dispose();
     super.dispose();
   }
 
@@ -78,64 +77,61 @@ class _HomePageState extends State<HomePage> {
         onExit: () {},
       ),
       appBar: AppBar(
-        title: isSearching
-            ? TextField(
-                controller: searchController,
-                autofocus: true,
-                decoration: const InputDecoration(
-                  hintText: 'Search by Character, Episode or Location...',
-                  hintStyle: TextStyle(color: Colors.black),
+        title: const Text('The Rick And Morty')
+      ),
+      body: Column(
+        children: [
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: TextField(
+              controller: searchController,
+              decoration: InputDecoration(
+                prefixIcon: Icon(Icons.search, color: Colors.grey[600]),
+                hintText: 'Search Character',
+                filled: true,
+                fillColor: Colors.white,
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(10),
+                  borderSide: BorderSide.none,
                 ),
-                onChanged: (_) {},
-              )
-            : const Text('The Rick And Morty'),
-        actions: [
-          isSearching
-              ? IconButton(
-                  icon: const Icon(Icons.cancel),
-                  onPressed: () {
-                    setState(() => isSearching = false);
-                  },
-                )
-              : IconButton(
-                  icon: const Icon(Icons.search),
-                  onPressed: () {
-                    setState(() => isSearching = true);
-                  },
+              ),
+              onChanged: (_) {},
+            ),
+          ),
+          Expanded(
+            child: Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: GridView.builder(
+                controller: _scrollController,
+                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                  crossAxisCount: 2,
+                  crossAxisSpacing: 5.0,
+                  mainAxisSpacing: 5.0,
+                  childAspectRatio: 1.4,
                 ),
-          IconButton(
-            onPressed: fetchInitialCharacters,
-            icon: const Icon(Icons.refresh),
+                itemCount: characters.length + (isLoading ? 1 : 0),
+                itemBuilder: (context, index) {
+                  if (index == characters.length) {
+                    return const Center(child: CircularProgressIndicator());
+                  }
+                  final character = characters[index];
+                  return Transform.scale(
+                    scale: 1.0,
+                    child: CharacterCard(
+                      imageUrl: character.image,
+                      name: character.name,
+                      status: character.status,
+                      species: character.species,
+                      lastKnownLocation: character.location.name,
+                      firstSeen: character.origin.name,
+                      locationUrl: character.origin.url,
+                    ),
+                  );
+                },
+              ),
+            ),
           ),
         ],
-      ),
-      body: Padding(
-        padding: const EdgeInsets.all(8.0),
-        child: GridView.builder(
-          controller: _scrollController, // Added scroll controller
-          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-            crossAxisCount: 2,
-            crossAxisSpacing: 8.0,
-            mainAxisSpacing: 8.0,
-            childAspectRatio: 0.7,
-          ),
-          itemCount: characters.length + (isLoading ? 1 : 0), // Added loading indicator item
-          itemBuilder: (context, index) {
-            if (index == characters.length) {
-              return const Center(child: CircularProgressIndicator()); // Show loader at end
-            }
-            final character = characters[index];
-            return CharacterCard(
-              imageUrl: character.image,
-              name: character.name,
-              status: character.status,
-              species: character.species,
-              lastKnownLocation: character.location.name,
-              firstSeen: character.origin.name,
-              locationUrl: character.origin.url,
-            );
-          },
-        ),
       ),
     );
   }
